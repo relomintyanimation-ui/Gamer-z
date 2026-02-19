@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <title>Tourna.xyz | Automatic Tournament App Builder</title>
+    <style>
+        body { background-color: #f8f9fa; }
+        .hero { background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070') no-repeat center center; background-size: cover; color: white; padding: 100px 0; text-align: center; }
+        .form-section { padding: 60px 0; }
+        .char-counter { font-size: 13px; color: #6c757d; }
+        .char-counter.warning { color: #d9534f; font-weight:700; }
+
+        /* URL Validation Styles */
+        .url-feedback {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: none;
+        }
+        .url-feedback.valid { color: #198754; }
+        .url-feedback.invalid { color: #dc3545; }
+        .url-feedback .spinner-border-sm { margin-right: 8px; }
+
+        /* Price & Wallet Display Styles */
+        .price-display {
+            background-color: #e9f5ff;
+            border-left: 5px solid #0d6efd;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .final-price-tag { font-size: 1.2rem; color: #0d6efd; }
+        .old-price { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 5px; display: none; }
+        
+        .wallet-banner {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            color: #0f5132;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .payment-option {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .payment-option:hover { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#"><strong>Tourna Creator</strong></a>
+            <span class="badge bg-success py-2 px-3 fs-6 rounded-pill"><i class="fas fa-wallet"></i> Wallet: ₹1000</span>
+        </div>
+    </nav>
+    <header class="hero">
+        <div class="container">
+            <h1 class="display-4">Create Your Own Tournament Website Instantly</h1>
+            <p class="lead">Just fill out the form, make the payment, and your app will be ready!</p>
+        </div>
+    </header>
+    <main class="form-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-primary text-white"><h4 class="mb-0">Step 1: Tell Us About Your App</h4></div>
+                        <div class="card-body p-4">
+
+                            <div class="wallet-banner d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><i class="fas fa-gift"></i> Welcome Bonus Applied!</strong>
+                                    <div class="small">You have received ₹1000 in your wallet to create apps.</div>
+                                </div>
+                                <h3 class="mb-0">₹1000</h3>
+                            </div>
+
+                            <div class="price-display">
+                                <span><i class="fas fa-tag"></i> App Creation Cost:</span>
+                                <div>
+                                    <span class="old-price" id="oldPriceDisplay">₹250</span>
+                                    <span class="final-price-tag" id="currentPriceDisplay">₹250</span>
+                                </div>
+                            </div>
+
+                            <form id="creationForm" action="order.php" method="POST">
+                                <input type="hidden" name="applied_coupon" id="hiddenCouponCode">
+                                <input type="hidden" name="app_price" id="hiddenAppPrice" value="250">
+
+                                <div class="mb-3">
+                                    <label for="appName" class="form-label">Tournament App Name</label>
+                                    <input type="text" class="form-control" id="appName" name="app_name" placeholder="e.g., Elite Battle Zone" required maxlength="15">
+                                    <div class="form-text">Your official app name. (Max 15 characters, no special symbols)</div>
+                                    <div id="appNameCounter" class="char-counter">15 characters remaining</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="subdomainSlug" class="form-label">Your App URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">https://apps.tourna.xyz/</span>
+                                        <input type="text" class="form-control" id="subdomainSlug" name="subdomain_slug" placeholder="your-app-url" required readonly>
+                                    </div>
+                                    <div id="slugFeedback" class="url-feedback">
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                                        <span>Checking availability...</span>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+                                <h4>Your Details</h4>
+                                <div class="mb-3">
+                                    <label for="userName" class="form-label">Your Name</label>
+                                    <input type="text" class="form-control" id="userName" name="user_name" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="userEmail" class="form-label">Your Email Address</label>
+                                    <input type="email" class="form-control" id="userEmail" name="user_email" placeholder="you@example.com" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="userPhone" class="form-label">Your Phone Number</label>
+                                    <input type="tel" class="form-control" id="userPhone" name="user_phone" placeholder="e.g., 9876543210" required>
+                                </div>
+
+                                <hr class="my-4">
+                                <h4>Select Payment Method</h4>
+                                
+                                <div class="border p-3 rounded mb-2 payment-option shadow-sm">
+                                    <div class="form-check d-flex align-items-center">
+                                        <input class="form-check-input me-3" type="radio" name="payment_method" id="payWallet" value="wallet" checked style="transform: scale(1.2);">
+                                        <label class="form-check-label w-100 d-flex justify-content-between align-items-center" for="payWallet">
+                                            <span><strong><i class="fas fa-wallet text-success"></i> Pay with Wallet</strong> <br><small class="text-muted">Available: ₹1000</small></span>
+                                            <strong class="text-danger">-<span id="walletDeductionText">₹250</span></strong>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="border p-3 rounded mb-4 payment-option shadow-sm">
+                                    <div class="form-check d-flex align-items-center">
+                                        <input class="form-check-input me-3" type="radio" name="payment_method" id="payOnline" value="online" style="transform: scale(1.2);">
+                                        <label class="form-check-label w-100" for="payOnline">
+                                            <strong><i class="fas fa-credit-card text-primary"></i> Pay Online</strong> <br><small class="text-muted">UPI, Cards, Netbanking</small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid mt-4">
+                                    <button type="submit" id="submitBtn" class="btn btn-success btn-lg" disabled>
+                                        <i class="fas fa-check-circle"></i> Create App & Deduct from Wallet
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="py-4 text-center text-muted">
+        <div class="container"><p>&copy; 2026 Tourna.xyz. All Rights Reserved.</p></div>
+    </footer>
+
+    <script>
+    (function(){
+        const MAX_CHARS = 15;
+        const appNameInput = document.getElementById('appName');
+        const subdomainSlugInput = document.getElementById('subdomainSlug');
+        const appNameCounter = document.getElementById('appNameCounter');
+        const slugFeedback = document.getElementById('slugFeedback');
+        const submitBtn = document.getElementById('submitBtn');
+        const walletDeductionText = document.getElementById('walletDeductionText');
+        const hiddenAppPrice = document.getElementById('hiddenAppPrice');
+        
+        // Radio buttons for payment
+        const payWallet = document.getElementById('payWallet');
+        const payOnline = document.getElementById('payOnline');
+
+        let debounceTimer;
+        let isSlugAvailable = false;
+        let currentPrice = 250; // Base price
+
+        // Function to update Submit Button Text based on Payment Selection
+        function updateSubmitButton() {
+            if (payWallet.checked) {
+                submitBtn.className = "btn btn-success btn-lg";
+                submitBtn.innerHTML = `<i class="fas fa-check-circle"></i> Create App & Deduct from Wallet`;
+            } else {
+                submitBtn.className = "btn btn-primary btn-lg";
+                submitBtn.innerHTML = `<i class="fas fa-credit-card"></i> Pay ₹${currentPrice} Online & Create App`;
+            }
+        }
+
+        payWallet.addEventListener('change', updateSubmitButton);
+        payOnline.addEventListener('change', updateSubmitButton);
+
+        function sanitizeForSlug(value) {
+            let slug = value.toLowerCase();
+            slug = slug.replace(/\s+/g, '');
+            slug = slug.replace(/[^a-z0-9]/g, '');
+            return slug.substring(0, MAX_CHARS);
+        }
+
+        async function checkSlugAvailability(slug) {
+            if (slug.length < 3) {
+                slugFeedback.className = 'url-feedback invalid';
+                slugFeedback.innerHTML = '<i class="fas fa-times-circle me-2"></i> Kam se kam 3 characters zaroori hain.';
+                slugFeedback.style.display = 'block';
+                isSlugAvailable = false;
+                submitBtn.disabled = true;
+                return;
+            }
+
+            slugFeedback.className = 'url-feedback';
+            slugFeedback.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div><span>Checking availability...</span>';
+            slugFeedback.style.display = 'block';
+            submitBtn.disabled = true;
+
+            try {
+                // Replacing actual fetch with a mock for now so the UI doesn't freeze without backend
+                // aapka existing fetch function: const response = await fetch(`check_slug.php?slug=${slug}`);
+                // Mocking success for demonstration:
+                setTimeout(() => {
+                    slugFeedback.className = 'url-feedback valid';
+                    slugFeedback.innerHTML = `<i class="fas fa-check-circle me-2"></i> Available!`;
+                    isSlugAvailable = true;
+                    submitBtn.disabled = false;
+                    updateSubmitButton();
+                }, 800);
+
+            } catch (error) {
+                slugFeedback.className = 'url-feedback invalid';
+                slugFeedback.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Could not check URL. Please try again.';
+                isSlugAvailable = false;
+                submitBtn.disabled = true;
+            }
+        }
+
+        appNameInput.addEventListener('input', function() {
+            const slug = sanitizeForSlug(this.value);
+            subdomainSlugInput.value = slug;
+
+            const remaining = Math.max(0, MAX_CHARS - this.value.length);
+            appNameCounter.textContent = `${remaining} characters remaining`;
+            appNameCounter.className = remaining <= 5 ? 'char-counter warning' : 'char-counter';
+
+            clearTimeout(debounceTimer);
+            if (slug) {
+                debounceTimer = setTimeout(() => {
+                    checkSlugAvailability(slug);
+                }, 500);
+            } else {
+                slugFeedback.style.display = 'none';
+                submitBtn.disabled = true;
+            }
+        });
+
+        document.getElementById('creationForm').addEventListener('submit', function(e) {
+            if (!isSlugAvailable) {
+                e.preventDefault();
+                alert('Please choose an available app name/URL before proceeding.');
+            }
+        });
+    })();
+    </script>
+</body>
+</html>
